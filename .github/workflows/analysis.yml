@@ -1,0 +1,20 @@
+name: Static Code Analysis
+
+on: [ push, pull_request ]
+
+jobs:
+  spotbugs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      # Install required tools
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: "temurin"
+          java-version: "11"
+
+      # Run static code analysis
+      - name: Run spotbugs:check
+        run: mvn spotbugs:check -B

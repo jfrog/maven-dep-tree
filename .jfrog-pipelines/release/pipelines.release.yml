@@ -1,0 +1,83 @@
+pipelines:
+  - name: release_maven_dep_tree
+    configuration:
+      runtime:
+        type: image
+        image:
+          auto:
+            language: java
+            versions:
+              - "11"
+      environmentVariables:
+        readOnly:
+          NEXT_VERSION: 0.0.0
+          NEXT_DEVELOPMENT_VERSION: 0.0.x-SNAPSHOT
+
+    steps:
+      - name: Release
+        type: Bash
+        configuration:
+          inputResources:
+            - name: mavenDepTreeReleaseGit
+          integrations:
+            - name: il_automation
+            - name: ecosys_entplus_deployer
+            - name: mvn_central
+        execution:
+          onExecute:
+            - cd $res_mavenDepTreeReleaseGit_resourcePath
+
+            # Set env
+            - export CI=true
+            - export JFROG_BUILD_STATUS=PASS
+            - export JFROG_CLI_BUILD_NAME=ecosystem-maven-dep-tree-release
+            - export JFROG_CLI_BUILD_NUMBER=$run_number
+            - export JFROG_CLI_BUILD_PROJECT=ecosys
+
+            # Configure git
+            - git checkout main
+            - git remote set-url origin https://$int_il_automation_token@github.com/jfrog/maven-dep-tree.git
+
+            # Make sure versions provided
+            - echo "Checking variables"
+            - test -n "$NEXT_VERSION" -a "$NEXT_VERSION" != "0.0.0"
+            - test -n "$NEXT_DEVELOPMENT_VERSION" -a "$NEXT_DEVELOPMENT_VERSION" != "0.0.x-SNAPSHOT"
+
+            # Configure JFrog CLI
+            - curl -fL https://install-cli.jfrog.io | sh
+            - jf c rm --quiet
+            - jf c add internal --url=$int_ecosys_entplus_deployer_url --user=$int_ecosys_entplus_deployer_user --password=$int_ecosys_entplus_deployer_apikey
+            - jf mvnc --repo-resolve-releases ecosys-maven-remote --repo-resolve-snapshots ecosys-maven-remote --repo-deploy-releases ecosys-oss-release-local --repo-deploy-snapshots ecosys-oss-snapshot-local
+
+            # Run audit
+            - jf audit
+
+            # Update version
+            - env -i PATH=$PATH M2_HOME=$M2_HOME HOME=$HOME jf mvn versions:set -DnewVersion="${NEXT_VERSION}" -B
+            - git commit -am "[jfrog-release] Release version ${NEXT_VERSION} [skipRun]" --allow-empty
+            - git tag ${NEXT_VERSION}
+
+            # Run validations, build and publish
+            - jf mvn clean deploy
+            - jf rt bag && jf rt bce
+            - jf rt bp
+
+            # Distribute release bundle
+            - jf ds rbc ecosystem-maven-dep-tree $NEXT_VERSION --spec=./.jfrog-pipelines/release/specs/prod-rbc-filespec.json --spec-vars="version=$NEXT_VERSION" --sign
+            - jf ds rbd ecosystem-maven-dep-tree $NEXT_VERSION --site="releases.jfrog.io" --sync
+
+            # Publish to Maven Central
+            - >
+              OSSRH_USERNAME=$int_mvn_central_user
+              OSSRH_PASSWORD=$int_mvn_central_password
+              OSSRH_GPG_PRIVATE_KEY=$(echo $int_mvn_central_signingKey | base64 -d)
+              OSSRH_GPG_PASSPHRASE=$int_mvn_central_signingPassword
+              mvn -B deploy -Pupload-to-central -s .jfrog-pipelines/release/settings.xml
+
+            # Update next development version
+            - env -i PATH=$PATH M2_HOME=$M2_HOME HOME=$HOME jf mvn versions:set -DnewVersion=$NEXT_DEVELOPMENT_VERSION -B
+            - git commit -am "[artifactory-release] Next development version [skipRun]"
+
+            # Push changes
+            - git push
+            - git push --tags
