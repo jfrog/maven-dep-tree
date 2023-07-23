@@ -1,6 +1,6 @@
-package com.jfrog;
+package com.jfrog.mavendeptree;
 
-import com.jfrog.dependenciesResults.MavenDependencyNode;
+import com.jfrog.mavendeptree.dependenciesresults.MavenDependencyNode;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.shared.dependency.graph.DependencyNode;
@@ -13,8 +13,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import static com.jfrog.Utils.getGavString;
-import static com.jfrog.Utils.populateDependencyMap;
+import static com.jfrog.mavendeptree.Utils.getGavString;
+import static com.jfrog.mavendeptree.Utils.populateDependencyMap;
 import static org.testng.Assert.*;
 
 /**

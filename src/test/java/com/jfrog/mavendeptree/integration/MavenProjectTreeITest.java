@@ -1,4 +1,4 @@
-package com.jfrog.integration;
+package com.jfrog.mavendeptree.integration;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,8 +11,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
-import static com.jfrog.integration.Utils.mapper;
-import static com.jfrog.integration.Utils.runMavenProjectTree;
+import static com.jfrog.mavendeptree.integration.Utils.mapper;
+import static com.jfrog.mavendeptree.integration.Utils.runMavenProjectTree;
 import static org.testng.Assert.*;
 
 /**

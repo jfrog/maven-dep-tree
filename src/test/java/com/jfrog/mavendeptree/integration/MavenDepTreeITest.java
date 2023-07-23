@@ -1,8 +1,8 @@
-package com.jfrog.integration;
+package com.jfrog.mavendeptree.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jfrog.dependenciesResults.MavenDepTreeResults;
-import com.jfrog.dependenciesResults.MavenDependencyNode;
+import com.jfrog.mavendeptree.dependenciesresults.MavenDepTreeResults;
+import com.jfrog.mavendeptree.dependenciesresults.MavenDependencyNode;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.it.VerificationException;
 import org.testng.annotations.AfterMethod;
@@ -16,8 +16,8 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
 
-import static com.jfrog.Utils.createMapper;
-import static com.jfrog.integration.Utils.runMavenDepTree;
+import static com.jfrog.mavendeptree.Utils.createMapper;
+import static com.jfrog.mavendeptree.integration.Utils.runMavenDepTree;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 

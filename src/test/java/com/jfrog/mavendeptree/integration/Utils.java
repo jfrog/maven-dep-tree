@@ -1,4 +1,4 @@
-package com.jfrog.integration;
+package com.jfrog.mavendeptree.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
@@ -15,7 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import static com.jfrog.Utils.createMapper;
+import static com.jfrog.mavendeptree.Utils.createMapper;
 
 /**
  * @author yahavi

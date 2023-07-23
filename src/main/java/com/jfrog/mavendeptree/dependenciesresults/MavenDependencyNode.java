@@ -1,4 +1,4 @@
-package com.jfrog.dependenciesResults;
+package com.jfrog.mavendeptree.dependenciesresults;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
