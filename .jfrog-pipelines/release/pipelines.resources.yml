@@ -1,0 +1,20 @@
+resources:
+  - name: mavenDepTreeSnapshotGit
+    type: GitRepo
+    configuration:
+      path: jfrog/maven-dep-tree
+      gitProvider: il_automation
+      buildOn:
+        pullRequestCreate: true
+      branches:
+        include: master
+      cancelPendingRunsOn:
+        pullRequestUpdate: true
+
+  - name: mavenDepTreeReleaseGit
+    type: GitRepo
+    configuration:
+      path: jfrog/maven-dep-tree
+      gitProvider: il_automation
+      buildOn:
+        commit: false
