@@ -65,7 +65,7 @@ public class Utils {
     }
 
     /**
-     * Recursively populate the dependency nodes map from the given dependency tree.
+     * Recursively populates the dependency nodes map from the given dependency tree.
      *
      * @param node  - The dependency tree of a Maven project
      * @param nodes - Nodes map to populate

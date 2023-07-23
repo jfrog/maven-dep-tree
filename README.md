@@ -4,7 +4,7 @@
 # 🪶 Maven Dependency Tree
 
 This Maven plugin reads the Maven dependencies of a given Maven project, and generates a dependency tree.
-This package was developed by JFrog, and is used by [Frogbot](https://github.com/jfrog/frogbot)
+This package was developed by JFrog, and is used by [JFrog Frogbot](https://github.com/jfrog/frogbot)
 to generate the dependency tree for projects using Maven dependencies.
 
 ## Table of Contents
