@@ -58,7 +58,7 @@ pipelines:
             - git tag ${NEXT_VERSION}
 
             # Run validations, build and publish
-            - jf mvn clean deploy
+            - jf mvn clean deploy -B
             - jf rt bag && jf rt bce
             - jf rt bp
 
