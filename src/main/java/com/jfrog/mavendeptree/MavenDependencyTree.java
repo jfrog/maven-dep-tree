@@ -1,6 +1,6 @@
-package com.jfrog;
+package com.jfrog.mavendeptree;
 
-import com.jfrog.dependenciesResults.MavenDepTreeResults;
+import com.jfrog.mavendeptree.dependenciesresults.MavenDepTreeResults;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
@@ -18,8 +18,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-import static com.jfrog.Utils.createDependencyTree;
-import static com.jfrog.Utils.writeResultsToFile;
+import static com.jfrog.mavendeptree.Utils.createDependencyTree;
+import static com.jfrog.mavendeptree.Utils.writeResultsToFile;
 import static java.lang.System.lineSeparator;
 
 /**

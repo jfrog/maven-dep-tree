@@ -1,4 +1,4 @@
-package com.jfrog;
+package com.jfrog.mavendeptree;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
@@ -7,7 +7,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.File;
 
-import static com.jfrog.Utils.getGavString;
+import static com.jfrog.mavendeptree.Utils.getGavString;
 
 /**
  * @author yahavi

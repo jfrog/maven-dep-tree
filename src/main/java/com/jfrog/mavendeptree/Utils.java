@@ -1,11 +1,11 @@
-package com.jfrog;
+package com.jfrog.mavendeptree;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.jfrog.dependenciesResults.MavenDepTreeResults;
-import com.jfrog.dependenciesResults.MavenDependencyNode;
+import com.jfrog.mavendeptree.dependenciesresults.MavenDepTreeResults;
+import com.jfrog.mavendeptree.dependenciesresults.MavenDependencyNode;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
