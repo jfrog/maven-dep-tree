@@ -63,14 +63,12 @@ pipelines:
             - jf rt bp
 
             # Distribute release bundle
-            # - jf ds rbc ecosystem-maven-dep-tree $NEXT_VERSION --spec=./.jfrog-pipelines/release/specs/prod-rbc-filespec.json --spec-vars="version=$NEXT_VERSION" --sign
-            # - jf ds rbd ecosystem-maven-dep-tree $NEXT_VERSION --site="releases.jfrog.io" --sync
+            - jf ds rbc ecosystem-maven-dep-tree $NEXT_VERSION --spec=./.jfrog-pipelines/release/specs/prod-rbc-filespec.json --spec-vars="version=$NEXT_VERSION" --sign
+            - jf ds rbd ecosystem-maven-dep-tree $NEXT_VERSION --site="releases.jfrog.io" --sync
 
             # Publish to Maven Central
             - echo $int_mvn_central_signingKey | base64 -d > ~/private.key
             - gpg --batch --import ~/private.key
-            - gpg --list-keys
-            - gpg --list-signatures
             - >
               OSSRH_USERNAME=$int_mvn_central_user
               OSSRH_PASSWORD=$int_mvn_central_password
