@@ -10,6 +10,9 @@
     <packaging>maven-plugin</packaging>
     <url>https://github.com/jfrog/maven-dep-tree</url>
     <name>maven-dep-tree</name>
+    <description>Maven plugin that reads the Maven dependencies of a given Maven project, and generates a dependency
+        tree.
+    </description>
 
     <properties>
         <maven.min.version>3.6.3</maven.min.version>
