@@ -6,8 +6,18 @@
             <id>ossrh</id>
             <username>${env.OSSRH_USERNAME}</username>
             <password>${env.OSSRH_PASSWORD}</password>
-            <privateKey>${env.OSSRH_GPG_PRIVATE_KEY}</privateKey>
-            <passphrase>${env.OSSRH_GPG_PASSPHRASE}</passphrase>
         </server>
     </servers>
+    <profiles>
+        <profile>
+            <id>ossrh</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <gpg.executable>gpg</gpg.executable>
+                <gpg.passphrase>${env.OSSRH_GPG_PASSPHRASE}</gpg.passphrase>
+            </properties>
+        </profile>
+    </profiles>
 </settings>
