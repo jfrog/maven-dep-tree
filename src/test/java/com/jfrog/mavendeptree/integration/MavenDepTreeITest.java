@@ -9,7 +9,9 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.testng.collections.Sets;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -17,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.jfrog.mavendeptree.Utils.createMapper;
+import static com.jfrog.mavendeptree.integration.Utils.getPluginVersion;
 import static com.jfrog.mavendeptree.integration.Utils.runMavenDepTree;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
@@ -25,6 +28,7 @@ import static org.testng.Assert.assertNotNull;
  * @author yahavi
  */
 public class MavenDepTreeITest {
+    private final String pluginVersion = getPluginVersion();
     ObjectMapper mapper = createMapper();
     private String testOutputDir;
 
@@ -39,9 +43,9 @@ public class MavenDepTreeITest {
     }
 
     @Test
-    public void testMultiModule() throws VerificationException, IOException {
+    public void testMultiModule() throws VerificationException, IOException, ParserConfigurationException, SAXException {
         // Run Mojo
-        List<String> depsTreeOutputFiles = runMavenDepTree("multi-module", testOutputDir);
+        List<String> depsTreeOutputFiles = runMavenDepTree("multi-module", testOutputDir, pluginVersion);
 
         // Read output path
         assertEquals(depsTreeOutputFiles.size(), 4);
@@ -81,7 +85,7 @@ public class MavenDepTreeITest {
 
     private void testMavenArchetype(String projectName) throws VerificationException, IOException {
         // Run Mojo
-        List<String> depsTreeOutputFile = runMavenDepTree(projectName, testOutputDir);
+        List<String> depsTreeOutputFile = runMavenDepTree(projectName, testOutputDir, pluginVersion);
 
         // Read output path
         assertEquals(depsTreeOutputFile.size(), 1);

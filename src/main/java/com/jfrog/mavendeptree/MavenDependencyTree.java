@@ -16,7 +16,6 @@ import org.apache.maven.shared.dependency.graph.DependencyGraphBuilderException;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 import static com.jfrog.mavendeptree.Utils.createDependencyTree;
 import static com.jfrog.mavendeptree.Utils.writeResultsToFile;
@@ -47,7 +46,7 @@ public class MavenDependencyTree extends AbstractMojo {
 
     @Override
     public void execute() throws MojoExecutionException {
-        try (FileWriter fileWriter = new FileWriter(depsTreeOutputFile, StandardCharsets.UTF_8, true)) {
+        try (FileWriter fileWriter = new FileWriter(depsTreeOutputFile, true)) {
             MavenDepTreeResults results = createDependencyTree(dependencyGraphBuilder, session, project);
             File resultsPath = writeResultsToFile(project, results);
             fileWriter.append(resultsPath.getAbsolutePath()).append(lineSeparator());

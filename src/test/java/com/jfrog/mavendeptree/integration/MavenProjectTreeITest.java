@@ -8,21 +8,22 @@ import org.apache.maven.it.VerificationException;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
-import static com.jfrog.mavendeptree.integration.Utils.mapper;
-import static com.jfrog.mavendeptree.integration.Utils.runMavenProjectTree;
+import static com.jfrog.mavendeptree.integration.Utils.*;
 import static org.testng.Assert.*;
 
 /**
  * @author yahavi
  */
 public class MavenProjectTreeITest {
+    private final String pluginVersion = getPluginVersion();
+
     @Test
     public void testMultiModule() throws VerificationException, IOException {
         // Run Mojo
-        List<String> projectInfos = runMavenProjectTree("multi-module");
+        List<String> projectInfos = runMavenProjectTree("multi-module", pluginVersion);
 
         // Test output
         assertEquals(projectInfos.size(), 4);
@@ -31,19 +32,19 @@ public class MavenProjectTreeITest {
             switch (projectInfo.getGav()) {
                 case "org.jfrog.test:multi:3.7-SNAPSHOT":
                     assertEquals(projectInfo.getParentGav(), "");
-                    assertTrue(StringUtils.endsWith(projectInfo.getPomPath(), Path.of("multi-module", "pom.xml").toString()));
+                    assertTrue(StringUtils.endsWith(projectInfo.getPomPath(), Paths.get("multi-module", "pom.xml").toString()));
                     break;
                 case "org.jfrog.test:multi1:3.7-SNAPSHOT":
                     assertEquals(projectInfo.getParentGav(), "org.jfrog.test:multi:3.7-SNAPSHOT");
-                    assertTrue(StringUtils.endsWith(projectInfo.getPomPath(), Path.of("multi-module", "multi1", "pom.xml").toString()));
+                    assertTrue(StringUtils.endsWith(projectInfo.getPomPath(), Paths.get("multi-module", "multi1", "pom.xml").toString()));
                     break;
                 case "org.jfrog.test:multi2:3.7-SNAPSHOT":
                     assertEquals(projectInfo.getParentGav(), "org.jfrog.test:multi:3.7-SNAPSHOT");
-                    assertTrue(StringUtils.endsWith(projectInfo.getPomPath(), Path.of("multi-module", "multi2", "pom.xml").toString()));
+                    assertTrue(StringUtils.endsWith(projectInfo.getPomPath(), Paths.get("multi-module", "multi2", "pom.xml").toString()));
                     break;
                 case "org.jfrog.test:multi3:3.7-SNAPSHOT":
                     assertEquals(projectInfo.getParentGav(), "org.jfrog.test:multi:3.7-SNAPSHOT");
-                    assertTrue(StringUtils.endsWith(projectInfo.getPomPath(), Path.of("multi-module", "multi3", "pom.xml").toString()));
+                    assertTrue(StringUtils.endsWith(projectInfo.getPomPath(), Paths.get("multi-module", "multi3", "pom.xml").toString()));
                     break;
                 default:
                     fail("Unexpected GAV: " + projectInfo.getGav());
@@ -63,14 +64,14 @@ public class MavenProjectTreeITest {
 
     private void testMavenArchetype(String projectName) throws VerificationException, IOException {
         // Run Mojo
-        List<String> projectInfoJson = runMavenProjectTree(projectName);
+        List<String> projectInfoJson = runMavenProjectTree(projectName, pluginVersion);
 
         // Test output
         assertEquals(projectInfoJson.size(), 1);
         ProjectInfo projectInfo = mapper.readValue(escapePathInWindows(projectInfoJson.get(0)), ProjectInfo.class);
         assertEquals(projectInfo.getGav(), "org.example:maven-archetype-simple:1.0-SNAPSHOT");
         assertEquals(projectInfo.getParentGav(), "");
-        assertTrue(StringUtils.endsWith(projectInfo.getPomPath(), Path.of(projectName, "pom.xml").toString()));
+        assertTrue(StringUtils.endsWith(projectInfo.getPomPath(), Paths.get(projectName, "pom.xml").toString()));
     }
 
     private static String escapePathInWindows(String path) {
