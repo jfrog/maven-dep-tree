@@ -19,7 +19,7 @@ import org.apache.maven.shared.dependency.graph.DependencyNode;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -99,7 +99,7 @@ public class Utils {
      * @throws IOException in case of any unexpected I/O error.
      */
     static File writeResultsToFile(MavenProject project, MavenDepTreeResults results) throws IOException {
-        File targetDir = Path.of(project.getModel().getBuild().getDirectory(), "maven-dep-tree").toFile();
+        File targetDir = Paths.get(project.getModel().getBuild().getDirectory(), "maven-dep-tree").toFile();
         FileUtils.forceMkdir(targetDir);
         File resultsPath = targetDir.toPath().resolve(Base64.getEncoder().encodeToString(project.getName().getBytes(StandardCharsets.UTF_8))).toFile();
         mapper.writeValue(resultsPath, results);
