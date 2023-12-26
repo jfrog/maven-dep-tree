@@ -75,11 +75,12 @@ public class Utils {
         MavenDependencyNode mavenDependencyNode = nodes.get(getGavString(artifact));
         if (mavenDependencyNode == null) {
             // Node does not exist in the Map - add it
-            mavenDependencyNode = new MavenDependencyNode(artifact.getScope());
+            mavenDependencyNode = new MavenDependencyNode(artifact.getScope(), artifact.getType());
             nodes.put(getGavString(artifact), mavenDependencyNode);
         } else {
             // Node exists in the map - add the scope
             mavenDependencyNode.addConfiguration(artifact.getScope());
+            mavenDependencyNode.addType(artifact.getType());
         }
         List<DependencyNode> children = node.getChildren();
         if (children != null) {

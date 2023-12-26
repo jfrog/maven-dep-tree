@@ -18,10 +18,14 @@ public class MavenDependencyNode {
     private final Set<String> children = new HashSet<>();
     // The Maven scopes such as compile, runtime, test, etc. We use the same naming convention as in the gradle-dep-tree.
     private final Set<String> configurations = new HashSet<>();
+    private final Set<String> types = new HashSet<>();
 
-    public MavenDependencyNode(String configuration) {
+    public MavenDependencyNode(String configuration, String type) {
         if (configuration != null) {
             this.configurations.add(configuration);
+        }
+        if (type != null) {
+            this.types.add(type);
         }
     }
 
@@ -33,9 +37,13 @@ public class MavenDependencyNode {
         configurations.add(configuration);
     }
 
+    public void addType(String type) {
+        configurations.add(type);
+    }
+
     @Override
     public int hashCode() {
-        return Objects.hash(children, configurations);
+        return Objects.hash(children, configurations, types);
     }
 
     @Override
