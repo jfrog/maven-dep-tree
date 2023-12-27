@@ -38,7 +38,7 @@ public class MavenDependencyNode {
     }
 
     public void addType(String type) {
-        configurations.add(type);
+        types.add(type);
     }
 
     @Override

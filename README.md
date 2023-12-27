@@ -48,6 +48,9 @@ mvn com.jfrog:maven-dep-tree:tree -DdepsTreeOutputFile=<path/to/output/file>
       "children": [],
       "configurations": [
         "test"
+      ],
+      "types": [
+        "jar"
       ]
     },
     "org.jfrog.test:multi:3.7-SNAPSHOT": {
@@ -55,7 +58,9 @@ mvn com.jfrog:maven-dep-tree:tree -DdepsTreeOutputFile=<path/to/output/file>
         "junit:junit:3.8.1"
       ],
       "configurations": [],
-      "types": ["jar"]
+      "types": [
+        "jar"
+      ]
     }
   }
 }
