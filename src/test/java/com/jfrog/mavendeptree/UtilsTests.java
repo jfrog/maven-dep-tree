@@ -24,22 +24,22 @@ public class UtilsTests {
 
     @Test
     public void testPopulateDependencyMapNoChildren() {
-        DependencyNode root = createDependency("root-group", "root-artifact", "root-version", null);
+        DependencyNode root = createDependency("root-group", "root-artifact", "root-version", null, "");
         runPopulateDependencyMap(root, 1);
     }
 
     @Test
     public void testPopulateDependencyMapDuplicateChildren() {
-        DefaultDependencyNode root = createDependency("root-group", "root-artifact", "root-version", null);
+        DefaultDependencyNode root = createDependency("root-group", "root-artifact", "root-version", null, "");
 
         // Root's children
-        DefaultDependencyNode firstChild = createDependency("child1-group", "child1-artifact", "child1-version", "scope1");
-        DefaultDependencyNode secondChild = createDependency("child2-group", "child2-artifact", "child2-version", "scope2");
+        DefaultDependencyNode firstChild = createDependency("child1-group", "child1-artifact", "child1-version", "scope1", "");
+        DefaultDependencyNode secondChild = createDependency("child2-group", "child2-artifact", "child2-version", "scope2", "type2");
         root.setChildren(Lists.newArrayList(firstChild, secondChild));
 
         // First child's children
-        DefaultDependencyNode thirdChild = createDependency("child3-group", "child3-artifact", "child3-version", "scope3");
-        DefaultDependencyNode secondsChildWithOtherScope = createDependency("child2-group", "child2-artifact", "child2-version", "other-scope");
+        DefaultDependencyNode thirdChild = createDependency("child3-group", "child3-artifact", "child3-version", "scope3", "");
+        DefaultDependencyNode secondsChildWithOtherScope = createDependency("child2-group", "child2-artifact", "child2-version", "other-scope", "other-type");
 
         firstChild.setChildren(Lists.newArrayList(secondsChildWithOtherScope, thirdChild));
 
@@ -60,20 +60,21 @@ public class UtilsTests {
         assertNotNull(secondChildNode);
         assertEquals(secondChildNode.getChildren(), new HashSet<>());
         assertEquals(secondChildNode.getConfigurations(), Sets.newHashSet("scope2", "other-scope"));
+        assertEquals(secondChildNode.getTypes(), Sets.newHashSet("type2", "other-type"));
     }
 
     @Test
     public void testGetNodeId() {
-        Artifact artifact = createArtifact("group", "artifact", "1.0.0", "scope");
+        Artifact artifact = createArtifact("group", "artifact", "1.0.0", "scope", "");
         assertEquals(getGavString(artifact), "group:artifact:1.0.0");
     }
 
-    private Artifact createArtifact(String groupId, String artifactId, String version, String scope) {
-        return new DefaultArtifact(groupId, artifactId, version, scope, "", "", null);
+    private Artifact createArtifact(String groupId, String artifactId, String version, String scope, String type) {
+        return new DefaultArtifact(groupId, artifactId, version, scope, type, "", null);
     }
 
-    private DefaultDependencyNode createDependency(String groupId, String artifactId, String version, String scope) {
-        Artifact artifact = createArtifact(groupId, artifactId, version, scope);
+    private DefaultDependencyNode createDependency(String groupId, String artifactId, String version, String scope, String type) {
+        Artifact artifact = createArtifact(groupId, artifactId, version, scope, type);
         return new DefaultDependencyNode(artifact);
     }
 
