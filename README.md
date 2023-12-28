@@ -59,7 +59,7 @@ mvn com.jfrog:maven-dep-tree:tree -DdepsTreeOutputFile=<path/to/output/file>
       ],
       "configurations": [],
       "types": [
-        "jar"
+        "pom"
       ]
     }
   }
