@@ -80,33 +80,29 @@ public class Utils {
      * @throws VerificationException in case of any Maven Verifier error.
      */
     static List<String> runMavenProjectTree(String projectName, String pluginVersion, Boolean withOutputFile) throws IOException, VerificationException {
-        try {
-            File testDir = ResourceExtractor.simpleExtractResources(Utils.class, "/integration/" + projectName);
-            Verifier verifier = new Verifier(testDir.getAbsolutePath());
+        File testDir = ResourceExtractor.simpleExtractResources(Utils.class, "/integration/" + projectName);
+        Verifier verifier = new Verifier(testDir.getAbsolutePath());
 
-            if (StringUtils.equalsIgnoreCase(System.getProperty("debugITs"), "true")) {
-                verifier.setEnvironmentVariable("MAVEN_OPTS", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005");
-            }
-
-            String outputFile = verifier.getLogFileName();
-            List<String> goals = Lists.newArrayList("clean", "com.jfrog:maven-dep-tree:" + pluginVersion + ":projects", "-q");
-
-            if (withOutputFile) {
-                goals.add("-DdepsTreeOutputFile=" + testDir.getAbsolutePath() + "/testOutput.out");
-                outputFile = "testOutput.out";
-            }
-
-            verifier.executeGoals(goals);
-            verifier.verifyErrorFreeLog();
-            List<String> results = verifier.loadFile(verifier.getBasedir(), outputFile, false);
-
-            if (withOutputFile) {
-                Files.deleteIfExists(Path.of(testDir.getAbsolutePath(), outputFile));
-            }
-
-            return results;
-        } catch (IOException | VerificationException e) {
-            throw e;
+        if (StringUtils.equalsIgnoreCase(System.getProperty("debugITs"), "true")) {
+            verifier.setEnvironmentVariable("MAVEN_OPTS", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005");
         }
+
+        String outputFile = verifier.getLogFileName();
+        List<String> goals = Lists.newArrayList("clean", "com.jfrog:maven-dep-tree:" + pluginVersion + ":projects", "-q");
+
+        if (withOutputFile) {
+            goals.add("-DdepsTreeOutputFile=" + testDir.getAbsolutePath() + "/testOutput.out");
+            outputFile = "testOutput.out";
+        }
+
+        verifier.executeGoals(goals);
+        verifier.verifyErrorFreeLog();
+        List<String> results = verifier.loadFile(verifier.getBasedir(), outputFile, false);
+
+        if (withOutputFile) {
+            Files.deleteIfExists(Paths.get(testDir.getAbsolutePath(), outputFile));
+        }
+
+        return results;
     }
 }
