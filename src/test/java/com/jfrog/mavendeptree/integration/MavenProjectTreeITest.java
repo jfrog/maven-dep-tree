@@ -1,5 +1,6 @@
 package com.jfrog.mavendeptree.integration;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,11 +24,24 @@ public class MavenProjectTreeITest {
     @Test
     public void testMultiModule() throws VerificationException, IOException {
         // Run Mojo
-        List<String> projectInfos = runMavenProjectTree("multi-module", pluginVersion);
+        List<String> projectInfos = runMavenProjectTree("multi-module", pluginVersion, false);
 
         // Test output
-        assertEquals(projectInfos.size(), 4);
-        for (String projectInfoJson : projectInfos) {
+       verifyTestMultiModuleResults(projectInfos);
+    }
+
+    @Test
+    public void testMultiModuleWithOutputFile() throws VerificationException, IOException {
+        // Run Mojo
+        List<String> projectInfos = runMavenProjectTree("multi-module", pluginVersion, true);
+
+        // Test output
+        verifyTestMultiModuleResults(projectInfos);
+    }
+
+    private void verifyTestMultiModuleResults(List<String> testResults) throws JsonProcessingException {
+        assertEquals(testResults.size(), 4);
+        for (String projectInfoJson : testResults) {
             ProjectInfo projectInfo = mapper.readValue(escapePathInWindows(projectInfoJson), ProjectInfo.class);
             switch (projectInfo.getGav()) {
                 case "org.jfrog.test:multi:3.7-SNAPSHOT":
@@ -64,7 +78,7 @@ public class MavenProjectTreeITest {
 
     private void testMavenArchetype(String projectName) throws VerificationException, IOException {
         // Run Mojo
-        List<String> projectInfoJson = runMavenProjectTree(projectName, pluginVersion);
+        List<String> projectInfoJson = runMavenProjectTree(projectName, pluginVersion, false);
 
         // Test output
         assertEquals(projectInfoJson.size(), 1);
