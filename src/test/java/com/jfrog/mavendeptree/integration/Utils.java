@@ -95,7 +95,7 @@ public class Utils {
             Path tempFile = Files.createTempFile(Paths.get(testDir.getAbsolutePath()), "testOutput", ".out");
             String tempFilePath = tempFile.toAbsolutePath().toString();
             goals.add("-DdepsTreeOutputFile=" + tempFilePath);
-            outputFile = tempFile.toString();
+            outputFile = Paths.get(tempFilePath).getFileName().toString();
         }
 
         verifier.executeGoals(goals);
