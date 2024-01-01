@@ -15,7 +15,7 @@
     </description>
 
     <properties>
-        <!-- CAUTION: Modifying the Maven version may cause disruptions for numerous users. Avoid altering it.   -->
+        <!-- CAUTION: Modifying the Maven version may cause disruptions for numerous users. Avoid altering it. -->
         <maven.min.version>3.6.3</maven.min.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>8</maven.compiler.source>
