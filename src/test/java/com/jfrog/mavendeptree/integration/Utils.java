@@ -75,6 +75,7 @@ public class Utils {
      *
      * @param projectName   - The test project to run
      * @param pluginVersion - The plugin version
+     * @param withOutputFile - Write the test result to a temporary output file
      * @return the output.
      * @throws IOException           in case of any unexpected I/O error.
      * @throws VerificationException in case of any Maven Verifier error.
@@ -91,8 +92,10 @@ public class Utils {
         List<String> goals = Lists.newArrayList("clean", "com.jfrog:maven-dep-tree:" + pluginVersion + ":projects", "-q");
 
         if (withOutputFile) {
-            goals.add("-DdepsTreeOutputFile=" + testDir.getAbsolutePath() + "/testOutput.out");
-            outputFile = "testOutput.out";
+            Path tempFile = Files.createTempFile(Paths.get(testDir.getAbsolutePath()), "testOutput", ".out");
+            String tempFilePath = tempFile.toAbsolutePath().toString();
+            goals.add("-DdepsTreeOutputFile=" + tempFilePath);
+            outputFile = tempFile.toString();
         }
 
         verifier.executeGoals(goals);
