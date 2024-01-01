@@ -15,6 +15,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -74,18 +75,37 @@ public class Utils {
      *
      * @param projectName   - The test project to run
      * @param pluginVersion - The plugin version
+     * @param withOutputFile - Write the test result to a temporary output file
      * @return the output.
      * @throws IOException           in case of any unexpected I/O error.
      * @throws VerificationException in case of any Maven Verifier error.
      */
-    static List<String> runMavenProjectTree(String projectName, String pluginVersion) throws IOException, VerificationException {
+    static List<String> runMavenProjectTree(String projectName, String pluginVersion, Boolean withOutputFile) throws IOException, VerificationException {
         File testDir = ResourceExtractor.simpleExtractResources(Utils.class, "/integration/" + projectName);
         Verifier verifier = new Verifier(testDir.getAbsolutePath());
+
         if (StringUtils.equalsIgnoreCase(System.getProperty("debugITs"), "true")) {
             verifier.setEnvironmentVariable("MAVEN_OPTS", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005");
         }
-        verifier.executeGoals(Lists.newArrayList("clean", "com.jfrog:maven-dep-tree:" + pluginVersion + ":projects", "-q"));
+
+        String outputFile = verifier.getLogFileName();
+        List<String> goals = Lists.newArrayList("clean", "com.jfrog:maven-dep-tree:" + pluginVersion + ":projects", "-q");
+
+        if (withOutputFile) {
+            Path tempFile = Files.createTempFile(Paths.get(testDir.getAbsolutePath()), "testOutput", ".out");
+            String tempFilePath = tempFile.toAbsolutePath().toString();
+            goals.add("-DdepsTreeOutputFile=" + tempFilePath);
+            outputFile = Paths.get(tempFilePath).getFileName().toString();
+        }
+
+        verifier.executeGoals(goals);
         verifier.verifyErrorFreeLog();
-        return verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
+        List<String> results = verifier.loadFile(verifier.getBasedir(), outputFile, false);
+
+        if (withOutputFile) {
+            Files.deleteIfExists(Paths.get(testDir.getAbsolutePath(), outputFile));
+        }
+
+        return results;
     }
 }
