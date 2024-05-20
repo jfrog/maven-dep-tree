@@ -75,7 +75,7 @@ public class Utils {
         MavenDependencyNode mavenDependencyNode = nodes.get(getGavString(artifact));
         if (mavenDependencyNode == null) {
             // Node does not exist in the Map - add it
-            mavenDependencyNode = new MavenDependencyNode(artifact.getScope(), artifact.getType());
+            mavenDependencyNode = new MavenDependencyNode(artifact.getScope(), artifact.getType(), artifact.getClassifier());
             nodes.put(getGavString(artifact), mavenDependencyNode);
         } else {
             // Node exists in the map - add the scope
@@ -116,6 +116,9 @@ public class Utils {
     public static String getGavString(Artifact artifact) {
         if (artifact == null) {
             return "";
+        }
+        if (artifact.hasClassifier()) {
+            return String.join(":", artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion()+"-"+artifact.getClassifier());
         }
         return String.join(":", artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion());
     }

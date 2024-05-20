@@ -68,7 +68,7 @@ public class MavenDepTreeITest {
                 assertEquals(root, "org.jfrog.test:multi3:3.7-SNAPSHOT");
             } else {
                 assertEquals(root, "org.jfrog.test:multi:3.7-SNAPSHOT");
-                assertEquals(mavenDependencyTree.getNodes().get("junit:junit:3.8.1"), new MavenDependencyNode("test", "jar"));
+                assertEquals(mavenDependencyTree.getNodes().get("junit:junit:3.8.1"), new MavenDependencyNode("test", "jar", null));
             }
         }
     }
@@ -98,11 +98,16 @@ public class MavenDepTreeITest {
 
         // Check nodes
         Map<String, MavenDependencyNode> nodes = mavenDependencyTree.getNodes();
-        assertEquals(nodes.size(), 2);
+        assertEquals(nodes.size(), 3);
         MavenDependencyNode expectedFirstNode = new MavenDependencyNode();
         expectedFirstNode.addChild("junit:junit:3.8.1");
-        assertEquals(nodes.get("org.example:maven-archetype-simple:1.0-SNAPSHOT"), expectedFirstNode);
-        MavenDependencyNode expectedSecondNode = new MavenDependencyNode("test", "jar");
+        expectedFirstNode.addChild("org.testng:testng:5.9-jdk15");
+        MavenDependencyNode node1 = nodes.get("org.example:maven-archetype-simple:1.0-SNAPSHOT");
+        assertEquals(node1, expectedFirstNode);
+        MavenDependencyNode expectedSecondNode = new MavenDependencyNode("test", "jar", null);
         assertEquals(nodes.get("junit:junit:3.8.1"), expectedSecondNode);
+        // with classifier
+        MavenDependencyNode expectedThirdNode = new MavenDependencyNode("test", "jar", "jdk15");
+        assertEquals(nodes.get("org.testng:testng:5.9-jdk15"), expectedThirdNode);
     }
 }
