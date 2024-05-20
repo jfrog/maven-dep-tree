@@ -21,7 +21,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: "8"
-          distribution: "temurin"
+          distribution: "zulu"
 
       - uses: jfrog/frogbot@v2
         env:
