@@ -49,9 +49,6 @@ pipelines:
             - jf c add internal --url=$int_ecosys_entplus_deployer_url --user=$int_ecosys_entplus_deployer_user --password=$int_ecosys_entplus_deployer_apikey
             - jf mvnc --repo-resolve-releases ecosys-maven-remote --repo-resolve-snapshots ecosys-maven-remote --repo-deploy-releases ecosys-oss-release-local --repo-deploy-snapshots ecosys-oss-snapshot-local
 
-            # Run audit
-            # - jf audit
-
             # Update version
             - env -i PATH=$PATH M2_HOME=$M2_HOME HOME=$HOME jf mvn versions:set -DnewVersion="${NEXT_VERSION}" -B
             - git commit -am "[jfrog-release] Release version ${NEXT_VERSION} [skipRun]" --allow-empty
