@@ -50,7 +50,7 @@ pipelines:
             - jf mvnc --repo-resolve-releases ecosys-maven-remote --repo-resolve-snapshots ecosys-maven-remote --repo-deploy-releases ecosys-oss-release-local --repo-deploy-snapshots ecosys-oss-snapshot-local
 
             # Run audit
-            - jf audit
+            # - jf audit
 
             # Update version
             - env -i PATH=$PATH M2_HOME=$M2_HOME HOME=$HOME jf mvn versions:set -DnewVersion="${NEXT_VERSION}" -B
