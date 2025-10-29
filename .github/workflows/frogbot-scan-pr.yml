@@ -19,7 +19,7 @@ jobs:
       - uses: jfrog-fastci/fastci@main  # Use the FastCI optimization action
         with:
           github_token: ${{secrets.GITHUB_TOKEN}}
-          fastci_otel_token: ${{ secrets.COROLOGIX_OTEL_TOKEN }}
+          fastci_otel_token: ${{ secrets.FASTCI_TOKEN }}
 
       # Install prerequisites
       - name: Set up Java
