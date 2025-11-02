@@ -16,6 +16,11 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 
+      - uses: jfrog-fastci/fastci@main  # Use the FastCI optimization action
+        with:
+          github_token: ${{secrets.GITHUB_TOKEN}}
+          fastci_otel_token: ${{ secrets.FASTCI_TOKEN }}
+
       # Install prerequisites
       - name: Set up Java
         uses: actions/setup-java@v4
