@@ -22,7 +22,10 @@ import static com.jfrog.mavendeptree.Utils.createMapper;
 import static com.jfrog.mavendeptree.integration.Utils.getPluginVersion;
 import static com.jfrog.mavendeptree.integration.Utils.runMavenDepTree;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
 
 /**
  * @author yahavi
@@ -71,6 +74,37 @@ public class MavenDepTreeITest {
                 assertEquals(mavenDependencyTree.getNodes().get("junit:junit:3.8.1"), new MavenDependencyNode("test", "jar", null));
             }
         }
+    }
+
+    @Test
+    public void testIncludePluginDeps() throws VerificationException, IOException {
+        // With -DincludePluginDeps=true the build plugins' transitive dependencies are resolved via
+        // Aether and emitted under "pluginNodes". This exercises the full resolution + traversal path.
+        List<String> depsTreeOutputFiles = runMavenDepTree("plugin-deps", testOutputDir, pluginVersion, "-DincludePluginDeps=true");
+        assertEquals(depsTreeOutputFiles.size(), 1);
+
+        MavenDepTreeResults results = mapper.readValue(new File(depsTreeOutputFiles.get(0)), MavenDepTreeResults.class);
+
+        Map<String, MavenDependencyNode> pluginNodes = results.getPluginNodes();
+        assertNotNull(pluginNodes, "pluginNodes must be set when -DincludePluginDeps=true");
+        assertFalse(pluginNodes.isEmpty(), "expected the install-lifecycle build plugins to contribute deps");
+        // An install-lifecycle plugin (compile phase) and its transitive deps are included -
+        // the plugin artifact itself is reported too.
+        assertTrue(pluginNodes.containsKey("org.apache.maven.plugins:maven-compiler-plugin:3.8.0"),
+                "an install-lifecycle plugin artifact must be included in pluginNodes");
+        // A plugin bound to a post-install phase (deploy) is filtered out.
+        assertFalse(pluginNodes.containsKey("org.apache.maven.plugins:maven-deploy-plugin:2.8.2"),
+                "a post-install plugin must be excluded from pluginNodes");
+    }
+
+    @Test
+    public void testPluginDepsOmittedByDefault() throws VerificationException, IOException {
+        // Without the flag, pluginNodes is null (feature off), preserving the existing output contract.
+        List<String> depsTreeOutputFiles = runMavenDepTree("plugin-deps", testOutputDir, pluginVersion);
+        assertEquals(depsTreeOutputFiles.size(), 1);
+
+        MavenDepTreeResults results = mapper.readValue(new File(depsTreeOutputFiles.get(0)), MavenDepTreeResults.class);
+        assertNull(results.getPluginNodes(), "pluginNodes must be null when -DincludePluginDeps is not set");
     }
 
     @Test
