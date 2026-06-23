@@ -18,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.jfrog.mavendeptree.Utils.createMapper;
@@ -53,11 +54,12 @@ public class Utils {
      * @param projectName   - The test project to run
      * @param testOutputDir - Output test directory
      * @param pluginVersion - The plugin version
+     * @param extraArgs     - Additional Maven arguments to append (e.g. "-DincludePluginDeps=true")
      * @return the content of the generated 'depsTreeOutputFile' file.
      * @throws IOException           in case of any unexpected I/O error.
      * @throws VerificationException in case of any Maven Verifier error.
      */
-    static List<String> runMavenDepTree(String projectName, String testOutputDir, String pluginVersion) throws IOException, VerificationException {
+    static List<String> runMavenDepTree(String projectName, String testOutputDir, String pluginVersion, String... extraArgs) throws IOException, VerificationException {
         Path depsTreeOutputFilePath = Paths.get(testOutputDir, "depsTreeOutputFile");
 
         File testDir = ResourceExtractor.simpleExtractResources(Utils.class, "/integration/" + projectName);
@@ -65,7 +67,9 @@ public class Utils {
         if (StringUtils.equalsIgnoreCase(System.getProperty("debugITs"), "true")) {
             verifier.setEnvironmentVariable("MAVEN_OPTS", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005");
         }
-        verifier.executeGoals(Lists.newArrayList("clean", "com.jfrog:maven-dep-tree:" + pluginVersion + ":tree", "-DdepsTreeOutputFile=" + depsTreeOutputFilePath));
+        List<String> goals = Lists.newArrayList("clean", "com.jfrog:maven-dep-tree:" + pluginVersion + ":tree", "-DdepsTreeOutputFile=" + depsTreeOutputFilePath);
+        goals.addAll(Arrays.asList(extraArgs));
+        verifier.executeGoals(goals);
         verifier.verifyErrorFreeLog();
         return FileUtils.readLines(depsTreeOutputFilePath.toFile(), StandardCharsets.UTF_8);
     }

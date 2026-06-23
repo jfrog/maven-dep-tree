@@ -13,6 +13,7 @@ to generate the dependency tree for projects using Maven dependencies.
     - [Tree](#-tree)
         - [Output](#output)
         - [Output Tree Structure](#output-tree-structure)
+        - [Including Build-Plugin Dependencies](#including-build-plugin-dependencies)
     - [Project Info](#-project-info)
         - [Output](#output-1)
 - [Contributions](#-contributions)
@@ -65,6 +66,19 @@ mvn com.jfrog:maven-dep-tree:tree -DdepsTreeOutputFile=<path/to/output/file>
   }
 }
 ```
+
+#### Including Build-Plugin Dependencies
+
+Set `-DincludePluginDeps=true` (default `false`) to also resolve build plugins in the install
+lifecycle and their transitive dependencies. These are downloaded during `mvn install` but are
+invisible to `mvn dependency:tree`.
+
+```bash
+mvn com.jfrog:maven-dep-tree:tree -DdepsTreeOutputFile=<path/to/output/file> -DincludePluginDeps=true
+```
+
+The output then includes a `pluginNodes` map (same structure as `nodes`), omitted when the flag is
+off and empty when no plugin dependencies are found.
 
 ### 🧐 Project Info
 
