@@ -1,8 +1,0 @@
-{
-  "files": [
-    {
-      "pattern": "ecosys-oss-snapshot-local/(com/jfrog/maven-dep-tree/*/maven-dep-tree-*)",
-      "target": "oss-snapshot-local/{1}"
-    }
-  ]
-}
