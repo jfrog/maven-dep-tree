@@ -98,6 +98,41 @@ public class MavenDepTreeITest {
     }
 
     @Test
+    public void testActiveProfilePluginDependencyPin() throws VerificationException, IOException {
+        // activeByDefault profile pins JaCoCo's asm 9.8 to 9.7 and adds commons-codec, which JaCoCo lacks.
+        List<String> depsTreeOutputFiles = runMavenDepTree("plugin-profile-override", testOutputDir, pluginVersion, "-DincludePluginDeps=true");
+        assertEquals(depsTreeOutputFiles.size(), 1);
+
+        Map<String, MavenDependencyNode> pluginNodes = mapper.readValue(new File(depsTreeOutputFiles.get(0)), MavenDepTreeResults.class).getPluginNodes();
+        assertNotNull(pluginNodes);
+        for (String artifact : new String[]{"asm", "asm-commons", "asm-tree"}) {
+            assertTrue(pluginNodes.containsKey("org.ow2.asm:" + artifact + ":9.7"), artifact);
+            assertFalse(pluginNodes.containsKey("org.ow2.asm:" + artifact + ":9.8"), artifact);
+        }
+        assertTrue(pluginNodes.containsKey("commons-codec:commons-codec:1.15"));
+        assertTrue(pluginNodes.get("org.ow2.asm:asm:9.7").getConfigurations().contains("runtime"));
+        assertFalse(pluginNodes.containsKey("org.apache.commons:commons-lang3:3.12.0"));
+    }
+
+    @Test
+    public void testProfileSelectedWithDashP() throws VerificationException, IOException {
+        // -P turns off activeByDefault, so the pin and commons-lang3 come from selected-plugin-deps.
+        List<String> depsTreeOutputFiles = runMavenDepTree("plugin-profile-override", testOutputDir, pluginVersion,
+                "-DincludePluginDeps=true", "-Pselected-plugin-deps");
+        assertEquals(depsTreeOutputFiles.size(), 1);
+
+        Map<String, MavenDependencyNode> pluginNodes = mapper.readValue(new File(depsTreeOutputFiles.get(0)), MavenDepTreeResults.class).getPluginNodes();
+        assertTrue(pluginNodes.containsKey("org.ow2.asm:asm:9.7"));
+        assertFalse(pluginNodes.containsKey("org.ow2.asm:asm:9.8"));
+        // Only the default profile pins asm-commons, so 9.7 absent and 9.8 present proves it was turned off.
+        assertFalse(pluginNodes.containsKey("org.ow2.asm:asm-commons:9.7"));
+        assertTrue(pluginNodes.containsKey("org.ow2.asm:asm-commons:9.8"));
+        assertTrue(pluginNodes.containsKey("commons-codec:commons-codec:1.15"));
+        assertTrue(pluginNodes.containsKey("org.apache.commons:commons-lang3:3.12.0"));
+        assertTrue(pluginNodes.get("org.ow2.asm:asm:9.7").getConfigurations().contains("runtime"));
+    }
+
+    @Test
     public void testPluginDepsOmittedByDefault() throws VerificationException, IOException {
         // Without the flag, pluginNodes is null (feature off), preserving the existing output contract.
         List<String> depsTreeOutputFiles = runMavenDepTree("plugin-deps", testOutputDir, pluginVersion);

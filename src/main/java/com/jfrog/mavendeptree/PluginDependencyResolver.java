@@ -1,6 +1,7 @@
 package com.jfrog.mavendeptree;
 
 import com.jfrog.mavendeptree.dependenciesresults.MavenDependencyNode;
+import org.apache.maven.RepositoryUtils;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.model.Plugin;
@@ -16,7 +17,9 @@ import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.resolution.DependencyRequest;
+import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.eclipse.aether.resolution.DependencyResult;
+import org.eclipse.aether.util.artifact.JavaScopes;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 
 import java.util.Arrays;
@@ -35,8 +38,8 @@ import java.util.Set;
  * maven-compiler-plugin bound to {@code compile} by default for {@code jar} packaging)
  * are included. This mirrors what {@code mvn dependency:resolve-plugins} reports.
  *
- * <p>The resolver is intentionally non-fatal: any plugin or artifact that cannot be
- * resolved is logged and skipped, so the regular dependency tree is never broken.
+ * <p>The resolver is non-fatal. A plugin that fails to collect is logged and skipped. A download
+ * failure still emits the collected coordinates, and the JSON has no partial marker.
  */
 public class PluginDependencyResolver {
 
@@ -242,6 +245,9 @@ public class PluginDependencyResolver {
      * Resolves the given plugin and its transitive artifact closure via Aether and populates
      * {@code pluginDeps}. The plugin artifact itself is included; GAVs already collected
      * (keyed including classifier) are skipped to avoid duplicates.
+     *
+     * <p>Declared plugin dependencies, including those merged from an active profile, are added with
+     * runtime scope. System-scoped ones are skipped: they are local files, which differs from Maven.
      */
     private void resolvePluginTransitiveDeps(Plugin plugin, RepositorySystemSession repoSession, Map<String, MavenDependencyNode> pluginDeps) {
         String groupId = plugin.getGroupId();
@@ -257,11 +263,30 @@ public class PluginDependencyResolver {
                 new DefaultArtifact(groupId, artifactId, "jar", version), null);
 
         CollectRequest collectRequest = new CollectRequest(pluginDep, project.getRemotePluginRepositories());
+        if (plugin.getDependencies() != null) {
+            for (org.apache.maven.model.Dependency declared : plugin.getDependencies()) {
+                if (JavaScopes.SYSTEM.equals(declared.getScope())) {
+                    continue;
+                }
+                Dependency dep = RepositoryUtils.toDependency(declared, repoSession.getArtifactTypeRegistry());
+                collectRequest.addDependency(dep.setScope(JavaScopes.RUNTIME));
+            }
+        }
         DependencyRequest dependencyRequest = new DependencyRequest(collectRequest, null);
 
         DependencyResult result;
         try {
             result = repositorySystem.resolveDependencies(repoSession, dependencyRequest);
+        } catch (DependencyResolutionException e) {
+            result = e.getResult();
+            List<Exception> collectExceptions = result == null ? null : result.getCollectExceptions();
+            // A collection failure can omit the pin, so skip the plugin. A download failure keeps the graph.
+            if (result == null || result.getRoot() == null || (collectExceptions != null && !collectExceptions.isEmpty())) {
+                log.warn("[mvn-plugin-deps] failed to resolve plugin " + groupId + ":" + artifactId + ":" + version + " — " + e.getMessage());
+                return;
+            }
+            log.warn("[mvn-plugin-deps] some artifacts of plugin " + groupId + ":" + artifactId + ":" + version
+                    + " could not be resolved; keeping its collected dependencies — " + e.getMessage());
         } catch (Exception e) {
             // Broad on purpose: a single rogue plugin (resolution failure, or an NPE from an
             // odd embedder session) must never break the whole dependency tree.
