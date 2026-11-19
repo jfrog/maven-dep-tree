@@ -11,9 +11,8 @@ public class MavenDepTreeResults {
     // Build plugins (and their transitive deps) resolved when includePluginDeps=true.
     // Kept separate from nodes so the CLI can distinguish project deps from plugin deps
     // and apply curation checks only to the relevant artifact types.
-    // Null when plugin dependency resolution was not requested, or when it was requested
-    // but no plugin dependencies were found. Resolution itself is non-fatal: individual
-    // plugin/artifact failures are logged and skipped rather than producing a null result.
+    // Null when plugin resolution was not requested or found nothing. A plugin that fails to
+    // collect is skipped. A download failure still contributes its coordinates, with no partial marker.
     private Map<String, MavenDependencyNode> pluginNodes;
 
     // Empty constructor for deserialization

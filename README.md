@@ -78,7 +78,9 @@ mvn com.jfrog:maven-dep-tree:tree -DdepsTreeOutputFile=<path/to/output/file> -Di
 ```
 
 The output then includes a `pluginNodes` map (same structure as `nodes`), omitted when the flag is
-off and empty when no plugin dependencies are found.
+off and empty when no plugin dependencies are found. Dependencies declared on a plugin are reported
+with scope `runtime`. A download failure still includes the collected coordinates, and the JSON has
+no partial marker. A plugin that fails to resolve is omitted.
 
 ### 🧐 Project Info
 
